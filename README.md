@@ -1,0 +1,70 @@
+
+# 16-Core Parallel Computing for Higher-Order Numerical Differentiation
+
+本專案為**數值線性代數（Numerical Linear Algebra）**之高效能計算專案。針對一千萬個超高密度網格點（$N = 10,000,000$），設計並實作了**顯式六階中心差分格式（Explicit 6th-Order Central Difference Scheme）**，用以數值逼近函數 $f(x) = \cos(x)$ 的一階導數，並透過 Python `multiprocessing` 框架在 16 核心 CPU 環境下達成大規模數據平行加速。
+
+---
+
+## 📊 數值核心與數學原理
+
+傳統低階差分公式（如二階中心差分）在網格點密度極高時，為了達到足夠精確度必須使步長 $h$ 極小，然而過小的 $h$ 會導致計算機浮點數的**捨入誤差（Round-off Error）**急遽放大。
+
+本專案採用**六階中心差分格式**，其精確度為 $O(h^6)$。透過泰勒展開式（Taylor Series Expansion）消去低階誤差項後，其內部網格點的導數估計公式如下：
+
+$$f'(x) \approx \frac{f(x+3h) - 9f(x+2h) + 45f(x+1h) - 45f(x-1h) + 9f(x-2h) - f(x-3h)}{60h}$$
+
+### 截斷誤差與捨入誤差的平衡
+當網格點達一千萬點時，步長 $h \approx 3.14 \times 10^{-7}$。本專案跑出的最終最大絕對誤差為 **$1.26 \times 10^{-9}$**。此數值結果完美展現了數值分析中 **截斷誤差（Truncation Error）** 與雙精度浮點數 **捨入誤差** 互相拉扯後的真實物理極限，證明了高階顯式格式在密集網格下的卓越保真度。
+
+---
+
+## ⚡ 平行演算法架構設計
+
+本專案採用 **數據平行化（Data Parallelism）** 策略，屬於完全可平行化問題（Embarrassingly Parallel）：
+1. **零數據依賴性**：每個網格點 $x_i$ 的導數計算完全獨立，點與點之間不需要進行任何通訊或等待。
+2. **均勻切片（Chunking）**：將一千萬個網格點依據系統的 CPU 核心數（16 核心）進行均勻分塊，每個核心分配獨立的子區間進行序列差分計算。
+3. **數據合併**：計算完成後，主進程（Main Process）回收各子核心的局部陣列，一體化合併為最終的導數向量。
+
+相比於需要求解三對角矩陣的隱式緊緻差分（Compact Scheme），本格式在平行運算架構（CPU多線程/GPU CUDA）下具有壓倒性的計算吞吐量優勢。
+
+---
+
+## 📈 實驗效能報告
+
+### 實驗環境
+* **運算核心**: 16 Cores Parallel Compute
+* **網格密度**: 10,000,000 Points
+
+### 效能數據對比
+
+| 計算模式 | 總執行耗時 (秒) | 最大絕對誤差 (vs $-\sin x$) |
+| :--- | :--- | :--- |
+| **傳統單核心 (Serial)** | ~ 12.50 秒 (估計值) | $1.26 \times 10^{-9}$ |
+| **16 核心平行 (Parallel)** | **3.58 秒** | **$1.26 \times 10^{-9}$** |
+
+### 平行指標分析
+* **核心加速比 (Speedup)**: $\approx 3.5 \times$ 至 $4 \times$
+* **數值精確度**: 達到小數點後 9 位數精準趨近。
+
+---
+
+## 🛠️ 如何在本地執行與重現
+
+1. **複製本倉庫**
+   ```bash
+   git clone https://github.com
+   cd Parallel-Numerical-LA
+   ```
+
+2. **建立並啟用 uv 虛擬環境**
+   ```bash
+   uv venv
+   .venv\Scripts\activate
+   ```
+
+3. **安裝相依套件並運行**
+   ```bash
+   uv pip install numpy
+   python derivative_parallel_2.0.py
+   ```
+
