@@ -48,23 +48,3 @@ $$f'(x) \approx \frac{f(x+3h) - 9f(x+2h) + 45f(x+1h) - 45f(x-1h) + 9f(x-2h) - f(
 
 ---
 
-## 🛠️ 如何在本地執行與重現
-
-1. **複製本倉庫**
-   ```bash
-   git clone https://github.com
-   cd Parallel-Numerical-LA
-   ```
-
-2. **建立並啟用 uv 虛擬環境**
-   ```bash
-   uv venv
-   .venv\Scripts\activate
-   ```
-
-3. **安裝相依套件並運行**
-   ```bash
-   uv pip install numpy
-   python derivative_parallel_2.0.py
-   ```
-
