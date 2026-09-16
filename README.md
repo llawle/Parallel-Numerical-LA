@@ -1,7 +1,7 @@
 
 # 16-Core Parallel Computing for Higher-Order Numerical Differentiation
 
-本專案為**數值線性代數（Numerical Linear Algebra）**之高效能計算專案。針對一千萬個超高密度網格點（$N = 10,000,000$），設計並實作了**顯式六階中心差分格式（Explicit 6th-Order Central Difference Scheme）**，用以數值逼近函數 $f(x) = \cos(x)$ 的一階導數，並透過 Python `multiprocessing` 框架在 16 核心 CPU 環境下達成大規模數據平行加速。
+本專案為**數值線性代數（Numerical Linear Algebra）**之高效能計算專案。針對一千萬個超高密度網格點（N = 10,000,000），設計並實作了**顯式六階中心差分格式（Explicit 6th-Order Central Difference Scheme）**，用以數值逼近函數 $f(x) = \cos(x)$ 的一階導數，並透過 Python `multiprocessing` 框架在 16 核心 CPU 環境下達成大規模數據平行加速。
 
 ---
 
